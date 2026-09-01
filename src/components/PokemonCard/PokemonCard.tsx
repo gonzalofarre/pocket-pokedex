@@ -1,8 +1,10 @@
+import { Check, Plus } from 'lucide-react'
+import { useState } from 'react'
 import type { Pokemon } from '../../api/types'
 import { capitalize, formatPokemonId } from '../../utils/formatters'
-import { TypeBadge } from '../ui/TypeBadge'
+import { PokeballBurst } from '../ui/PokeballBurst'
 import { Spinner } from '../ui/Spinner'
-import { Check, Plus } from 'lucide-react'
+import { TypeBadge } from '../ui/TypeBadge'
 
 interface PokemonCardProps {
   pokemon?: Pokemon
@@ -19,6 +21,8 @@ export function PokemonCard({
   onSelect,
   onToggleFavorite,
 }: PokemonCardProps) {
+  const [showBurst, setShowBurst] = useState(false)
+
   if (isLoading || !pokemon) {
     return (
       <div className="flex h-[220px] items-center justify-center rounded-2xl border border-border bg-surface">
@@ -28,6 +32,11 @@ export function PokemonCard({
   }
 
   const sprite = pokemon.sprites.other?.['official-artwork']?.front_default ?? pokemon.sprites.front_default
+
+  const handleToggleFavorite = () => {
+    if (!isFavorite) setShowBurst(true)
+    onToggleFavorite()
+  }
 
   return (
     <div className="group flex flex-col rounded-2xl border border-border bg-surface p-4 shadow-sm transition hover:shadow-md">
@@ -55,19 +64,22 @@ export function PokemonCard({
             <TypeBadge key={slot.type.name} type={slot.type.name} />
           ))}
         </div>
-        <button
-          type="button"
-          onClick={onToggleFavorite}
-          aria-pressed={isFavorite}
-          aria-label={isFavorite ? `Remove ${pokemon.name} from favorites` : `Add ${pokemon.name} to favorites`}
-          className={`flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border transition ${
-            isFavorite
-              ? 'border-brand bg-brand text-text-inverted'
-              : 'border-border text-text-muted hover:border-brand hover:text-brand'
-          }`}
-        >
-          {isFavorite ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-        </button>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={handleToggleFavorite}
+            aria-pressed={isFavorite}
+            aria-label={isFavorite ? `Remove ${pokemon.name} from favorites` : `Add ${pokemon.name} to favorites`}
+            className={`flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border transition ${
+              isFavorite
+                ? 'border-brand bg-brand text-text-inverted'
+                : 'border-border text-text-muted hover:border-brand hover:text-brand'
+            }`}
+          >
+            {isFavorite ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+          </button>
+          {showBurst ? <PokeballBurst onComplete={() => setShowBurst(false)} /> : null}
+        </div>
       </div>
     </div>
   )
