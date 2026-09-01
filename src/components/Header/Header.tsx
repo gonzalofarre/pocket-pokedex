@@ -1,5 +1,5 @@
+import { Heart, Moon, Sun } from 'lucide-react'
 import type { Theme } from '../../hooks/useTheme'
-import { HeartIcon, MoonIcon, SunIcon } from '../ui/icons'
 
 interface HeaderProps {
   theme: Theme
@@ -30,7 +30,7 @@ export function Header({
               : 'border-border bg-surface text-text hover:border-brand hover:text-brand'
           }`}
         >
-          <HeartIcon className="h-4 w-4" filled={showingFavorites} />
+          <Heart className="h-4 w-4" fill={showingFavorites ? 'currentColor' : 'none'} />
           Favorites
           <span
             className={`rounded-full px-1.5 text-xs ${
@@ -46,7 +46,7 @@ export function Header({
           aria-label="Toggle color theme"
           className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text transition hover:border-brand"
         >
-          {theme === 'light' ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
+          {theme === 'light' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           {theme === 'light' ? 'Default Theme' : 'Dark Theme'}
         </button>
       </div>

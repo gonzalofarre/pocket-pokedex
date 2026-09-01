@@ -1,3 +1,4 @@
+import { BookOpen, Dumbbell, GitBranch, Ruler, Sparkles } from 'lucide-react'
 import type { ChainLink, EvolutionChain, Pokemon, PokemonSpecies } from '../../../api/types'
 import {
   capitalize,
@@ -7,7 +8,6 @@ import {
   getEnglishFlavorText,
   getEnglishGenus,
 } from '../../../utils/formatters'
-import { BookIcon, EvolutionIcon, RulerIcon, SparkleIcon, TrainingIcon } from '../../ui/icons'
 
 interface EvolutionStep {
   id: number
@@ -50,12 +50,12 @@ export function AboutTab({ pokemon, species, evolutionChain }: AboutTabProps) {
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <SectionHeading icon={<BookIcon />}>Pokédex Entry</SectionHeading>
+        <SectionHeading icon={<BookOpen className="h-4 w-4" />}>Pokédex Entry</SectionHeading>
         <p className="text-sm text-text">{flavorText || 'No description available.'}</p>
       </section>
 
       <section>
-        <SectionHeading icon={<TrainingIcon />}>Training</SectionHeading>
+        <SectionHeading icon={<Dumbbell className="h-4 w-4" />}>Training</SectionHeading>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <Stat label="Catch Rate" value={species ? String(species.capture_rate) : '—'} />
           <Stat
@@ -66,7 +66,7 @@ export function AboutTab({ pokemon, species, evolutionChain }: AboutTabProps) {
       </section>
 
       <section>
-        <SectionHeading icon={<RulerIcon />}>Physical Attributes</SectionHeading>
+        <SectionHeading icon={<Ruler className="h-4 w-4" />}>Physical Attributes</SectionHeading>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <Stat label="Height" value={formatHeight(pokemon.height)} />
           <Stat label="Weight" value={formatWeight(pokemon.weight)} />
@@ -75,7 +75,7 @@ export function AboutTab({ pokemon, species, evolutionChain }: AboutTabProps) {
 
       {evolutionSteps.length > 1 ? (
         <section>
-          <SectionHeading icon={<EvolutionIcon />}>Evolution Chain</SectionHeading>
+          <SectionHeading icon={<GitBranch className="h-4 w-4" />}>Evolution Chain</SectionHeading>
           <div className="flex flex-wrap items-center gap-2">
             {evolutionSteps.map((step, index) => (
               <div key={step.id} className="flex items-center gap-2">
@@ -97,7 +97,7 @@ export function AboutTab({ pokemon, species, evolutionChain }: AboutTabProps) {
 
       {genus ? (
         <section>
-          <SectionHeading icon={<SparkleIcon />}>Classification</SectionHeading>
+          <SectionHeading icon={<Sparkles className="h-4 w-4" />}>Classification</SectionHeading>
           <span className="inline-flex rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-text">
             {genus}
           </span>

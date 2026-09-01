@@ -2,7 +2,7 @@ import type { Pokemon } from '../../api/types'
 import { capitalize, formatPokemonId } from '../../utils/formatters'
 import { TypeBadge } from '../ui/TypeBadge'
 import { Spinner } from '../ui/Spinner'
-import { CheckIcon, PlusIcon } from '../ui/icons'
+import { Check, Plus } from 'lucide-react'
 
 interface PokemonCardProps {
   pokemon?: Pokemon
@@ -66,7 +66,7 @@ export function PokemonCard({
               : 'border-border text-text-muted hover:border-brand hover:text-brand'
           }`}
         >
-          {isFavorite ? <CheckIcon className="h-3.5 w-3.5" /> : <PlusIcon className="h-3.5 w-3.5" />}
+          {isFavorite ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
         </button>
       </div>
     </div>

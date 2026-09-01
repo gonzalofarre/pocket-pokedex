@@ -3,7 +3,7 @@ import { usePokemonDetail } from '../../hooks/usePokemonDetail'
 import { capitalize, formatHeight, formatPokemonId, formatWeight } from '../../utils/formatters'
 import { TypeBadge } from '../ui/TypeBadge'
 import { Spinner } from '../ui/Spinner'
-import { CloseIcon } from '../ui/icons'
+import { X } from 'lucide-react'
 import { StatsTab } from './tabs/StatsTab'
 import { MovesTab } from './tabs/MovesTab'
 import { AboutTab } from './tabs/AboutTab'
@@ -70,7 +70,7 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
             aria-label="Close"
             className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-text-muted transition hover:bg-surface-muted hover:text-text"
           >
-            <CloseIcon />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
