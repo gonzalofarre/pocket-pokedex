@@ -19,7 +19,7 @@ export function Header({
   return (
     <header className="flex flex-wrap items-center justify-between gap-3">
       <h1 className="text-2xl font-bold text-text sm:text-3xl">Pocket Pokédex</h1>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={onToggleFavoritesView}
