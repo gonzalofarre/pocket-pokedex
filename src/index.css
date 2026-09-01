@@ -12,3 +12,7 @@ body {
 body.modal-open {
   overflow: hidden;
 }
+
+.type-chip:not([aria-pressed='true']):hover {
+  border-color: var(--chip-color);
+}

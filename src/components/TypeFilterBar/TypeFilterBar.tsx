@@ -26,12 +26,12 @@ export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps
             type="button"
             onClick={() => onSelectType(isActive ? null : type.name)}
             aria-pressed={isActive}
-            className="shrink-0 cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition"
-            style={
-              isActive
-                ? { backgroundColor: getTypeColor(type.name), color: '#fff' }
-                : { backgroundColor: 'var(--color-surface-muted)', color: 'var(--color-text-muted)' }
-            }
+            className="type-chip shrink-0 cursor-pointer rounded-full border-2 border-transparent px-3 py-1 text-xs font-semibold transition"
+            style={{
+              '--chip-color': getTypeColor(type.name),
+              backgroundColor: isActive ? 'var(--chip-color)' : 'var(--color-surface-muted)',
+              color: isActive ? '#fff' : 'var(--color-text-muted)',
+            } as React.CSSProperties}
           >
             {capitalize(type.name)}
           </button>
