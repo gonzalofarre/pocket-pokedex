@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { Pokemon } from '../../api/types'
 import { capitalize, formatPokemonId } from '../../utils/formatters'
 import { PokeballBurst } from '../ui/PokeballBurst'
+import { PokeballPlaceholder } from '../ui/PokeballPlaceholder'
 import { Spinner } from '../ui/Spinner'
 import { TypeBadge } from '../ui/TypeBadge'
 
@@ -22,6 +23,7 @@ export function PokemonCard({
   onToggleFavorite,
 }: PokemonCardProps) {
   const [showBurst, setShowBurst] = useState(false)
+  const [imageFailed, setImageFailed] = useState(false)
 
   if (isLoading || !pokemon) {
     return (
@@ -51,10 +53,15 @@ export function PokemonCard({
           <span className="text-sm text-text-muted">{formatPokemonId(pokemon.id)}</span>
         </div>
         <div className="my-2 flex h-24 w-full items-center justify-center">
-          {sprite ? (
-            <img src={sprite} alt={pokemon.name} className="h-24 w-24 object-contain" />
+          {sprite && !imageFailed ? (
+            <img
+              src={sprite}
+              alt={pokemon.name}
+              className="h-24 w-24 object-contain"
+              onError={() => setImageFailed(true)}
+            />
           ) : (
-            <div className="h-24 w-24" />
+            <PokeballPlaceholder className="h-14 w-14 text-border" />
           )}
         </div>
       </button>

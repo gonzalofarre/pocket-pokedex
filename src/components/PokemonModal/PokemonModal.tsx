@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { usePokemonDetail } from '../../hooks/usePokemonDetail'
 import { capitalize, formatHeight, formatPokemonId, formatWeight } from '../../utils/formatters'
 import { TypeBadge } from '../ui/TypeBadge'
+import { PokeballPlaceholder } from '../ui/PokeballPlaceholder'
 import { Spinner } from '../ui/Spinner'
 import { X } from 'lucide-react'
 import { StatsTab } from './tabs/StatsTab'
@@ -23,11 +24,13 @@ interface PokemonModalProps {
 export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('stats')
   const [previousPokemonName, setPreviousPokemonName] = useState(pokemonName)
+  const [imageFailed, setImageFailed] = useState(false)
   const { pokemon, species, evolutionChain, isLoading } = usePokemonDetail(pokemonName)
 
   if (pokemonName !== previousPokemonName) {
     setPreviousPokemonName(pokemonName)
     if (pokemonName) setActiveTab('stats')
+    setImageFailed(false)
   }
 
   useEffect(() => {
@@ -83,7 +86,16 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
             <>
               <div className="flex gap-4 border-b border-border p-5">
                 <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-surface-muted">
-                  {sprite ? <img src={sprite} alt={pokemon.name} className="h-20 w-20 object-contain" /> : null}
+                  {sprite && !imageFailed ? (
+                    <img
+                      src={sprite}
+                      alt={pokemon.name}
+                      className="h-20 w-20 object-contain"
+                      onError={() => setImageFailed(true)}
+                    />
+                  ) : (
+                    <PokeballPlaceholder className="h-14 w-14 text-border" />
+                  )}
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm text-text-muted">{formatPokemonId(pokemon.id)}</span>
