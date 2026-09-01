@@ -7,10 +7,13 @@ interface TypeFilterBarProps {
   onSelectType: (type: string | null) => void
 }
 
-// PokeAPI's /type list includes two non-visual legacy entries with no color
-// or gameplay meaning in the mainline games; the design's filter row doesn't
-// include them either.
-const EXCLUDED_TYPES = new Set(['unknown', 'shadow'])
+// PokeAPI's /type list includes a few entries that aren't real filterable
+// types: "unknown" and "shadow" are non-visual legacy entries with no
+// gameplay meaning in the mainline games, and "stellar" (Gen 9 Terastal)
+// has zero pokémon associated via /type/stellar — filtering by it would
+// always show an empty grid. None of the three appear in the Figma mockup
+// either, which only modeled the 18 classic types.
+const EXCLUDED_TYPES = new Set(['unknown', 'shadow', 'stellar'])
 
 export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps) {
   const { data: types } = useTypesQuery()
