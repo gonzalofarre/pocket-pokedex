@@ -20,7 +20,7 @@ export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps
   const visibleTypes = (types ?? []).filter((type) => !EXCLUDED_TYPES.has(type.name))
 
   return (
-    <div className="flex flex-nowrap gap-2 overflow-x-auto pr-4 pb-1 sm:flex-wrap sm:overflow-visible sm:pr-0">
+    <div className="flex flex-nowrap gap-2 overflow-x-auto pr-4 pb-1 sm:flex-wrap sm:justify-between sm:overflow-visible sm:pr-0">
       {visibleTypes.map((type) => {
         const isActive = selectedType === type.name
         return (
