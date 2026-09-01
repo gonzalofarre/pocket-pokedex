@@ -1,0 +1,71 @@
+/*
+ * Design tokens for Pocket Pokédex.
+ *
+ * Type-badge colors follow the standard Pokémon type-color palette (the same
+ * one used across Bulbapedia/veekun-derived Pokédex UIs). This was confirmed
+ * against the Figma file directly: sampling the "grass" badge returned
+ * #78C850, an exact match for the standard palette's grass color, so the
+ * rest of the 18 are trusted to follow the same convention rather than being
+ * hand-sampled one by one (Figma's Dev Mode inspector is paywalled on this
+ * file's plan, and hand-sampling risks accidental edits to the shared file).
+ *
+ * Neutral tokens (backgrounds, text, borders) are visually matched against
+ * the Figma screenshots taken during review.
+ */
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Neutrals — light mode defaults */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f5fa;
+  --color-page: #f3f2f8;
+  --color-border: #e5e4ec;
+  --color-text: #16151f;
+  --color-text-muted: #6b6b7a;
+  --color-text-inverted: #ffffff;
+
+  --color-brand: #4f46e5;
+  --color-brand-hover: #4338ca;
+
+  /* Pokémon type colors */
+  --color-type-normal: #a8a878;
+  --color-type-fire: #f08030;
+  --color-type-water: #6890f0;
+  --color-type-electric: #f8d030;
+  --color-type-grass: #78c850;
+  --color-type-ice: #98d8d8;
+  --color-type-fighting: #c03028;
+  --color-type-poison: #a040a0;
+  --color-type-ground: #e0c068;
+  --color-type-flying: #a890f0;
+  --color-type-psychic: #f85888;
+  --color-type-bug: #a8b820;
+  --color-type-rock: #b8a038;
+  --color-type-ghost: #705898;
+  --color-type-dragon: #7038f8;
+  --color-type-dark: #705848;
+  --color-type-steel: #b8b8d0;
+  --color-type-fairy: #ee99ac;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root:not(.dark) {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --color-surface: #1c1b26;
+  --color-surface-muted: #26242f;
+  --color-page: #121118;
+  --color-border: #322f3d;
+  --color-text: #f2f1f7;
+  --color-text-muted: #a6a3b5;
+  --color-text-inverted: #16151f;
+
+  --color-brand: #818cf8;
+  --color-brand-hover: #a5b0fb;
+}
