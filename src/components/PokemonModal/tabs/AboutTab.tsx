@@ -1,4 +1,5 @@
 import { BookOpen, Dumbbell, GitBranch, Ruler, Sparkles } from 'lucide-react'
+import { useMemo } from 'react'
 import type { ChainLink, EvolutionChain, Pokemon, PokemonSpecies } from '../../../api/types'
 import {
   capitalize,
@@ -45,7 +46,13 @@ interface AboutTabProps {
 export function AboutTab({ pokemon, species, evolutionChain }: AboutTabProps) {
   const flavorText = species ? getEnglishFlavorText(species.flavor_text_entries) : ''
   const genus = species ? getEnglishGenus(species.genera) : ''
-  const evolutionSteps = evolutionChain ? flattenEvolutionChain(evolutionChain.chain) : []
+  // Recursive walk over the evolution chain — cheap for most pokémon, but no
+  // reason to redo it on renders that don't touch evolutionChain (e.g. tab
+  // switches within the same pokémon re-render this component's parent).
+  const evolutionSteps = useMemo(
+    () => (evolutionChain ? flattenEvolutionChain(evolutionChain.chain) : []),
+    [evolutionChain],
+  )
 
   return (
     <div className="flex flex-col gap-6">

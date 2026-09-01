@@ -1,5 +1,5 @@
 import { Check, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import type { Pokemon } from '../../api/types'
 import { capitalize, formatPokemonId } from '../../utils/formatters'
 import { PokeballBurst } from '../ui/PokeballBurst'
@@ -11,11 +11,17 @@ interface PokemonCardProps {
   pokemon?: Pokemon
   isLoading: boolean
   isFavorite: boolean
-  onSelect: () => void
-  onToggleFavorite: () => void
+  onSelect: (name: string) => void
+  onToggleFavorite: (id: number) => void
 }
 
-export function PokemonCard({
+// Memoized because the grid can hold hundreds of these (Load More, or the
+// full ~1350-entry list) — without it, every card re-renders on any
+// unrelated App-level state change (theme, favorites elsewhere, filter),
+// not just the one that actually changed. This only pays off because
+// onSelect/onToggleFavorite are stable callbacks passed straight through
+// by PokemonGrid rather than a new closure per item on every render.
+export const PokemonCard = memo(function PokemonCard({
   pokemon,
   isLoading,
   isFavorite,
@@ -24,6 +30,12 @@ export function PokemonCard({
 }: PokemonCardProps) {
   const [showBurst, setShowBurst] = useState(false)
   const [imageFailed, setImageFailed] = useState(false)
+
+  // Stable regardless of re-renders: PokeballBurst's own completion timer
+  // is keyed off this in a useEffect dependency array, so a fresh closure
+  // here on every render would reset that timer if the card re-rendered
+  // mid-animation.
+  const dismissBurst = useCallback(() => setShowBurst(false), [])
 
   if (isLoading || !pokemon) {
     return (
@@ -37,14 +49,14 @@ export function PokemonCard({
 
   const handleToggleFavorite = () => {
     if (!isFavorite) setShowBurst(true)
-    onToggleFavorite()
+    onToggleFavorite(pokemon.id)
   }
 
   return (
     <div className="group flex flex-col rounded-2xl border border-border bg-surface p-4 shadow-sm transition hover:shadow-md">
       <button
         type="button"
-        onClick={onSelect}
+        onClick={() => onSelect(pokemon.name)}
         className="flex cursor-pointer flex-col items-start text-left"
         aria-haspopup="dialog"
       >
@@ -90,9 +102,9 @@ export function PokemonCard({
           >
             {isFavorite ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
           </button>
-          {showBurst ? <PokeballBurst onComplete={() => setShowBurst(false)} /> : null}
+          {showBurst ? <PokeballBurst onComplete={dismissBurst} /> : null}
         </div>
       </div>
     </div>
   )
-}
+})

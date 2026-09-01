@@ -17,8 +17,8 @@ export function PokemonGrid({ pokemons, isFavorite, onSelect, onToggleFavorite }
           pokemon={item.detail}
           isLoading={item.isLoading}
           isFavorite={item.detail ? isFavorite(item.detail.id) : false}
-          onSelect={() => onSelect(item.name)}
-          onToggleFavorite={() => item.detail && onToggleFavorite(item.detail.id)}
+          onSelect={onSelect}
+          onToggleFavorite={onToggleFavorite}
         />
       ))}
     </div>

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import type { Pokemon } from '../../../api/types'
 import { capitalize } from '../../../utils/formatters'
 
@@ -22,7 +23,10 @@ function getLevelUpMoves(pokemon: Pokemon): LevelUpMove[] {
 }
 
 export function MovesTab({ pokemon }: { pokemon: Pokemon }) {
-  const moves = getLevelUpMoves(pokemon)
+  // Filters + sorts every move the pokémon can learn (can be 100+ entries
+  // for older species); no reason to redo that on renders unrelated to
+  // which pokémon is open (e.g. switching tabs back and forth).
+  const moves = useMemo(() => getLevelUpMoves(pokemon), [pokemon])
 
   if (moves.length === 0) {
     return <p className="text-sm text-text-muted">No level-up moves found.</p>
