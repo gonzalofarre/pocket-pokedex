@@ -6,7 +6,7 @@ import {
   formatPokemonId,
   formatWeight,
   getEnglishFlavorText,
-} from './formatters'
+} from '../formatters'
 
 describe('formatters', () => {
   it('capitalizes hyphenated names', () => {

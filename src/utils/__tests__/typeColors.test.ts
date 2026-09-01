@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getTypeColor, TYPE_COLORS } from './typeColors'
+import { getTypeColor, TYPE_COLORS } from '../typeColors'
 
 describe('getTypeColor', () => {
   it('returns the known color for a valid type', () => {
