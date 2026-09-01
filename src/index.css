@@ -14,7 +14,8 @@ body.modal-open {
 }
 
 .type-chip:not([aria-pressed='true']):hover {
-  border-color: var(--chip-color);
+  background-color: var(--chip-color);
+  color: #fff;
 }
 
 /*

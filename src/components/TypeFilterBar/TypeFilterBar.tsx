@@ -29,10 +29,11 @@ export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps
             type="button"
             onClick={() => onSelectType(isActive ? null : type.name)}
             aria-pressed={isActive}
-            className="type-chip shrink-0 cursor-pointer rounded-full border-2 border-transparent px-3 py-1 text-xs font-semibold transition"
+            className="type-chip shrink-0 cursor-pointer rounded-full border-2 px-3 py-1 text-xs font-semibold transition"
             style={{
               '--chip-color': getTypeColor(type.name),
-              backgroundColor: isActive ? 'var(--chip-color)' : 'var(--color-surface-muted)',
+              borderColor: 'var(--chip-color)',
+              backgroundColor: isActive ? 'var(--chip-color)' : 'transparent',
               color: isActive ? '#fff' : 'var(--color-text-muted)',
             } as React.CSSProperties}
           >
