@@ -11,7 +11,7 @@ export function TypeBadge({ type, size = 'sm' }: TypeBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center rounded-full font-semibold text-white ${sizeClasses}`}
+      className={`inline-flex cursor-pointer items-center rounded-full font-semibold text-white ${sizeClasses}`}
       style={{ backgroundColor: getTypeColor(type) }}
     >
       {capitalize(type)}

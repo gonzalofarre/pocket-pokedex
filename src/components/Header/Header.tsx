@@ -24,7 +24,7 @@ export function Header({
           type="button"
           onClick={onToggleFavoritesView}
           aria-pressed={showingFavorites}
-          className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
+          className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
             showingFavorites
               ? 'border-brand bg-brand text-text-inverted'
               : 'border-border bg-surface text-text hover:border-brand hover:text-brand'
@@ -44,7 +44,7 @@ export function Header({
           type="button"
           onClick={onToggleTheme}
           aria-label="Toggle color theme"
-          className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text transition hover:border-brand"
+          className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text transition hover:border-brand"
         >
           {theme === 'light' ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
           {theme === 'light' ? 'Default Theme' : 'Dark Theme'}

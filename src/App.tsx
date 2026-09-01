@@ -10,41 +10,55 @@ import { useFavorites } from './hooks/useFavorites'
 import { useFavoritePokemons } from './hooks/useFavoritePokemons'
 import { usePokemonList } from './hooks/usePokemonList'
 import { useTheme } from './hooks/useTheme'
+import { readUrlState, updateUrlState } from './utils/urlState'
 
-function readPokemonFromUrl(): string | null {
-  if (typeof window === 'undefined') return null
-  return new URLSearchParams(window.location.search).get('pokemon')
-}
+const initialUrlState = readUrlState()
 
 export default function App() {
   const { theme, toggleTheme } = useTheme()
   const { favorites, isFavorite, toggleFavorite } = useFavorites()
-  const [selectedType, setSelectedType] = useState<string | null>(null)
-  const [showingFavorites, setShowingFavorites] = useState(false)
-  const [selectedPokemon, setSelectedPokemon] = useState<string | null>(() => readPokemonFromUrl())
+  const [selectedType, setSelectedType] = useState<string | null>(initialUrlState.type)
+  const [showingFavorites, setShowingFavorites] = useState(initialUrlState.view === 'favorites')
+  const [selectedPokemon, setSelectedPokemon] = useState<string | null>(initialUrlState.pokemon)
 
-  const galleryList = usePokemonList(selectedType)
+  const galleryList = usePokemonList(selectedType, initialUrlState.count)
   const favoritePokemons = useFavoritePokemons(favorites)
 
   const activeList = showingFavorites ? favoritePokemons : galleryList.pokemons
 
+  // Keeps ?count in sync as more pages load, without persisting it for the
+  // favorites view (which isn't paginated).
+  useEffect(() => {
+    if (!showingFavorites) {
+      updateUrlState({ count: String(galleryList.visibleCount) })
+    }
+  }, [galleryList.visibleCount, showingFavorites])
+
+  const selectType = useCallback((type: string | null) => {
+    setSelectedType(type)
+    updateUrlState({ type })
+  }, [])
+
+  const toggleFavoritesView = useCallback(() => {
+    setShowingFavorites((current) => {
+      const next = !current
+      updateUrlState({ view: next ? 'favorites' : null })
+      return next
+    })
+  }, [])
+
   const openPokemon = useCallback((name: string) => {
     setSelectedPokemon(name)
-    const params = new URLSearchParams(window.location.search)
-    params.set('pokemon', name)
-    window.history.pushState({}, '', `?${params.toString()}`)
+    updateUrlState({ pokemon: name }, true)
   }, [])
 
   const closePokemon = useCallback(() => {
     setSelectedPokemon(null)
-    const params = new URLSearchParams(window.location.search)
-    params.delete('pokemon')
-    const query = params.toString()
-    window.history.pushState({}, '', query ? `?${query}` : window.location.pathname)
+    updateUrlState({ pokemon: null }, true)
   }, [])
 
   useEffect(() => {
-    const handlePopState = () => setSelectedPokemon(readPokemonFromUrl())
+    const handlePopState = () => setSelectedPokemon(readUrlState().pokemon)
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
@@ -56,13 +70,13 @@ export default function App() {
         onToggleTheme={toggleTheme}
         showingFavorites={showingFavorites}
         favoritesCount={favorites.length}
-        onToggleFavoritesView={() => setShowingFavorites((value) => !value)}
+        onToggleFavoritesView={toggleFavoritesView}
       />
 
       {!showingFavorites ? (
         <div className="mt-5">
           <h2 className="mb-2 text-sm font-semibold text-text-muted">Filter by type</h2>
-          <TypeFilterBar selectedType={selectedType} onSelectType={setSelectedType} />
+          <TypeFilterBar selectedType={selectedType} onSelectType={selectType} />
         </div>
       ) : null}
 

@@ -68,7 +68,7 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition hover:bg-surface-muted hover:text-text"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-text-muted transition hover:bg-surface-muted hover:text-text"
           >
             <CloseIcon />
           </button>
@@ -120,7 +120,7 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
                     onClick={() => setActiveTab(tab.key)}
                     aria-selected={activeTab === tab.key}
                     role="tab"
-                    className={`flex-1 border-b-2 px-3 py-2.5 text-sm font-semibold transition ${
+                    className={`flex-1 cursor-pointer border-b-2 px-3 py-2.5 text-sm font-semibold transition ${
                       activeTab === tab.key
                         ? 'border-brand text-brand'
                         : 'border-transparent text-text-muted hover:text-text'

@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getPokemonByType, getPokemonDetail, getPokemonList, getTypes } from '../api/pokemon'
 import type { NamedAPIResource, Pokemon } from '../api/types'
@@ -14,61 +14,24 @@ export function useTypesQuery() {
   })
 }
 
-/**
- * Resolves the ordered {name,url} list for the gallery: the default paginated
- * PokeAPI listing, or every pokémon of the selected type (PokeAPI's
- * /type/{name} has no pagination of its own, so "Load More" is applied
- * client-side over that full list to keep the same UX in both modes).
- */
-function usePokemonNames(selectedType: string | null) {
-  const defaultList = useInfiniteQuery({
-    queryKey: ['pokemon-names', 'default'],
-    queryFn: ({ pageParam }) => getPokemonList(PAGE_SIZE, pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.next ? allPages.length * PAGE_SIZE : undefined,
-    enabled: selectedType === null,
-  })
-
-  const typeList = useQuery({
-    queryKey: ['pokemon-names', 'type', selectedType],
-    queryFn: () => getPokemonByType(selectedType as string),
-    enabled: selectedType !== null,
-    select: (data) => data.pokemon.map((entry) => entry.pokemon),
-  })
-
-  if (selectedType === null) {
-    const names = defaultList.data?.pages.flatMap((page) => page.results) ?? []
-    return {
-      names,
-      isLoading: defaultList.isLoading,
-      isError: defaultList.isError,
-      hasMore: Boolean(defaultList.hasNextPage),
-      loadMore: () => defaultList.fetchNextPage(),
-      isLoadingMore: defaultList.isFetchingNextPage,
-    }
-  }
-
-  const allNames = typeList.data ?? []
-  return {
-    names: allNames,
-    isLoading: typeList.isLoading,
-    isError: typeList.isError,
-    // paginated further down by the visibleCount slice in usePokemonList
-    hasMore: null as boolean | null,
-    loadMore: null as (() => void) | null,
-    isLoadingMore: false,
-  }
-}
-
 export interface PokemonListItem {
   name: string
   detail: Pokemon | undefined
   isLoading: boolean
 }
 
-export function usePokemonList(selectedType: string | null) {
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+/**
+ * Gallery pagination is expressed as a single `visibleCount` (a multiple of
+ * PAGE_SIZE) rather than an incremental page cursor, so a caller can restore
+ * "3 pages in" after a reload by just seeding the initial count — no need to
+ * replay "Load More" clicks. The default listing re-requests
+ * `/pokemon?limit=visibleCount&offset=0` on growth; that endpoint only
+ * returns {name,url} pairs so the payload stays tiny, and the per-pokémon
+ * detail fetches below are cached individually, so growing the limit never
+ * re-fetches a pokémon already on screen.
+ */
+export function usePokemonList(selectedType: string | null, initialVisibleCount = PAGE_SIZE) {
+  const [visibleCount, setVisibleCount] = useState(initialVisibleCount)
   const [previousType, setPreviousType] = useState(selectedType)
 
   if (selectedType !== previousType) {
@@ -76,12 +39,26 @@ export function usePokemonList(selectedType: string | null) {
     setVisibleCount(PAGE_SIZE)
   }
 
-  const namesResult = usePokemonNames(selectedType)
-
   const isTypeFiltered = selectedType !== null
+
+  const defaultQuery = useQuery({
+    queryKey: ['pokemon-names', 'default', visibleCount],
+    queryFn: () => getPokemonList(visibleCount, 0),
+    enabled: !isTypeFiltered,
+  })
+
+  const typeQuery = useQuery({
+    queryKey: ['pokemon-names', 'type', selectedType],
+    queryFn: () => getPokemonByType(selectedType as string),
+    enabled: isTypeFiltered,
+    select: (data) => data.pokemon.map((entry) => entry.pokemon),
+  })
+
   const visibleNames: NamedAPIResource[] = isTypeFiltered
-    ? namesResult.names.slice(0, visibleCount)
-    : namesResult.names
+    ? (typeQuery.data ?? []).slice(0, visibleCount)
+    : (defaultQuery.data?.results ?? [])
+
+  const totalCount = isTypeFiltered ? (typeQuery.data?.length ?? 0) : (defaultQuery.data?.count ?? 0)
 
   const detailQueries = useQueries({
     queries: visibleNames.map((entry) => ({
@@ -97,24 +74,17 @@ export function usePokemonList(selectedType: string | null) {
     isLoading: detailQueries[index]?.isLoading ?? true,
   }))
 
-  const hasMore = isTypeFiltered
-    ? visibleCount < namesResult.names.length
-    : (namesResult.hasMore ?? false)
-
-  const loadMore = () => {
-    if (isTypeFiltered) {
-      setVisibleCount((count) => count + PAGE_SIZE)
-    } else {
-      namesResult.loadMore?.()
-    }
-  }
+  const isLoading = isTypeFiltered ? typeQuery.isLoading : defaultQuery.isLoading
+  const isError = isTypeFiltered ? typeQuery.isError : defaultQuery.isError
+  const isLoadingMore = !isLoading && (isTypeFiltered ? false : defaultQuery.isFetching)
 
   return {
     pokemons,
-    hasMore,
-    loadMore,
-    isLoading: namesResult.isLoading,
-    isError: namesResult.isError,
-    isLoadingMore: isTypeFiltered ? false : namesResult.isLoadingMore,
+    visibleCount,
+    hasMore: visibleCount < totalCount,
+    loadMore: () => setVisibleCount((count) => count + PAGE_SIZE),
+    isLoading,
+    isError,
+    isLoadingMore,
   }
 }

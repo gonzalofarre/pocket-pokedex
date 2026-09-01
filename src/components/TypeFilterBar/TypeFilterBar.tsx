@@ -26,7 +26,7 @@ export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps
             type="button"
             onClick={() => onSelectType(isActive ? null : type.name)}
             aria-pressed={isActive}
-            className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition"
+            className="shrink-0 cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition"
             style={
               isActive
                 ? { backgroundColor: getTypeColor(type.name), color: '#fff' }

@@ -34,7 +34,7 @@ export function PokemonCard({
       <button
         type="button"
         onClick={onSelect}
-        className="flex flex-col items-start text-left"
+        className="flex cursor-pointer flex-col items-start text-left"
         aria-haspopup="dialog"
       >
         <div className="flex w-full items-start justify-between">
@@ -60,7 +60,7 @@ export function PokemonCard({
           onClick={onToggleFavorite}
           aria-pressed={isFavorite}
           aria-label={isFavorite ? `Remove ${pokemon.name} from favorites` : `Add ${pokemon.name} to favorites`}
-          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition ${
+          className={`flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border transition ${
             isFavorite
               ? 'border-brand bg-brand text-text-inverted'
               : 'border-border text-text-muted hover:border-brand hover:text-brand'

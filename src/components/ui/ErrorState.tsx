@@ -11,7 +11,7 @@ export function ErrorState({ message = 'Something went wrong.', onRetry }: Error
         <button
           type="button"
           onClick={onRetry}
-          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-text-inverted transition hover:bg-brand-hover"
+          className="cursor-pointer rounded-full bg-brand px-4 py-2 text-sm font-semibold text-text-inverted transition hover:bg-brand-hover"
         >
           Try again
         </button>
