@@ -48,9 +48,14 @@ export function PokemonCard({
         className="flex cursor-pointer flex-col items-start text-left"
         aria-haspopup="dialog"
       >
-        <div className="flex w-full items-start justify-between">
-          <span className="font-semibold text-text">{capitalize(pokemon.name)}</span>
-          <span className="text-sm text-text-muted">{formatPokemonId(pokemon.id)}</span>
+        <div className="flex w-full items-start justify-between gap-2">
+          <span
+            className="line-clamp-2 min-h-[2lh] min-w-0 font-semibold text-text"
+            title={capitalize(pokemon.name)}
+          >
+            {capitalize(pokemon.name)}
+          </span>
+          <span className="shrink-0 text-sm text-text-muted">{formatPokemonId(pokemon.id)}</span>
         </div>
         <div className="my-2 flex h-24 w-full items-center justify-center">
           {sprite && !imageFailed ? (
