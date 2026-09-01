@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePokemonDetail } from '../../hooks/usePokemonDetail'
 import { capitalize, formatHeight, formatPokemonId, formatWeight } from '../../utils/formatters'
 import { TypeBadge } from '../ui/TypeBadge'
@@ -16,6 +16,9 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'about', label: 'About' },
 ]
 
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
 interface PokemonModalProps {
   pokemonName: string | null
   onClose: () => void
@@ -26,6 +29,8 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
   const [previousPokemonName, setPreviousPokemonName] = useState(pokemonName)
   const [imageFailed, setImageFailed] = useState(false)
   const { pokemon, species, evolutionChain, isLoading } = usePokemonDetail(pokemonName)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const previouslyFocusedElement = useRef<HTMLElement | null>(null)
 
   if (pokemonName !== previousPokemonName) {
     setPreviousPokemonName(pokemonName)
@@ -36,15 +41,46 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
   useEffect(() => {
     if (!pokemonName) return
 
+    // Standard dialog a11y pattern: remember what had focus, move focus
+    // into the dialog on open, and give it back on close — otherwise
+    // keyboard/screen-reader users get dropped back at the top of the
+    // page instead of where they were (the card that opened this).
+    previouslyFocusedElement.current = document.activeElement as HTMLElement | null
+    dialogRef.current?.focus()
+
     document.body.classList.add('modal-open')
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') {
+        onClose()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+      const dialog = dialogRef.current
+      if (!dialog) return
+
+      const focusable = dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+
+      // Trap Tab/Shift+Tab inside the dialog instead of letting focus
+      // escape to the page underneath.
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
 
     return () => {
       document.body.classList.remove('modal-open')
       window.removeEventListener('keydown', handleKeyDown)
+      previouslyFocusedElement.current?.focus()
     }
   }, [pokemonName, onClose])
 
@@ -59,11 +95,13 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm sm:p-6"
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
+        tabIndex={-1}
         aria-label={pokemon ? `${capitalize(pokemon.name)} details` : 'Pokémon details'}
         onClick={(event) => event.stopPropagation()}
-        className="flex max-h-full w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-surface shadow-2xl sm:max-h-[90vh]"
+        className="flex max-h-full w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-surface shadow-2xl outline-none sm:max-h-[90vh]"
       >
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <h2 className="text-lg font-bold text-text">Pokémon Details</h2>
