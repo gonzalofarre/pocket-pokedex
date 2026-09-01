@@ -8,7 +8,15 @@ provided Figma design.
 
 - **React 19 + TypeScript + Vite**
 - **Tailwind CSS v4** for styling
-- **@tanstack/react-query** for data fetching/caching against PokeAPI
+- **@tanstack/react-query** for server state — fetching/caching all PokeAPI data
+- **Redux Toolkit** for client state — favorites and theme, the two pieces of state that
+  actually need to live outside a component and persist across reloads (`src/store/`).
+  Deliberately not used for anything React Query already owns, or for the filter/view/modal
+  state in `App.tsx` (kept as local state synced to the URL) — a global store for state that's
+  either server data or already URL-addressable would just be two sources of truth for the same
+  thing.
+- **lucide-react** for icons
+- **lottie-react** for the Pokéball favorite-toggle animation
 - **Vitest + React Testing Library** for unit tests
 
 No backend — all data is fetched client-side directly from `pokeapi.co`.

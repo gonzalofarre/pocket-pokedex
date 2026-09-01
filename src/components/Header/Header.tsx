@@ -1,5 +1,5 @@
 import { Heart, Moon, Sun } from 'lucide-react'
-import type { Theme } from '../../hooks/useTheme'
+import type { Theme } from '../../store/themeSlice'
 
 interface HeaderProps {
   theme: Theme

@@ -6,17 +6,20 @@ import { LoadMoreButton } from './components/LoadMoreButton/LoadMoreButton'
 import { PokemonModal } from './components/PokemonModal/PokemonModal'
 import { ErrorState } from './components/ui/ErrorState'
 import { Spinner } from './components/ui/Spinner'
-import { useFavorites } from './hooks/useFavorites'
 import { useFavoritePokemons } from './hooks/useFavoritePokemons'
 import { usePokemonList } from './hooks/usePokemonList'
-import { useTheme } from './hooks/useTheme'
+import { useAppDispatch, useAppSelector } from './store/hooks'
+import { toggleFavorite as toggleFavoriteAction } from './store/favoritesSlice'
+import { toggleTheme as toggleThemeAction } from './store/themeSlice'
 import { readUrlState, updateUrlState } from './utils/urlState'
 
 const initialUrlState = readUrlState()
 
 export default function App() {
-  const { theme, toggleTheme } = useTheme()
-  const { favorites, isFavorite, toggleFavorite } = useFavorites()
+  const dispatch = useAppDispatch()
+  const theme = useAppSelector((state) => state.theme.value)
+  const favorites = useAppSelector((state) => state.favorites.ids)
+
   const [selectedType, setSelectedType] = useState<string | null>(initialUrlState.type)
   const [showingFavorites, setShowingFavorites] = useState(initialUrlState.view === 'favorites')
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(initialUrlState.pokemon)
@@ -26,6 +29,12 @@ export default function App() {
 
   const activeList = showingFavorites ? favoritePokemons : galleryList.pokemons
 
+  // Redux reducers stay pure; applying the theme to the DOM is a side
+  // effect of the value changing, so it lives here rather than in the slice.
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+  }, [theme])
+
   // Keeps ?count in sync as more pages load, without persisting it for the
   // favorites view (which isn't paginated).
   useEffect(() => {
@@ -33,6 +42,13 @@ export default function App() {
       updateUrlState({ count: String(galleryList.visibleCount) })
     }
   }, [galleryList.visibleCount, showingFavorites])
+
+  const isFavorite = useCallback((id: number) => favorites.includes(id), [favorites])
+  const handleToggleFavorite = useCallback(
+    (id: number) => dispatch(toggleFavoriteAction(id)),
+    [dispatch],
+  )
+  const handleToggleTheme = useCallback(() => dispatch(toggleThemeAction()), [dispatch])
 
   const selectType = useCallback((type: string | null) => {
     setSelectedType(type)
@@ -67,7 +83,7 @@ export default function App() {
     <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-10">
       <Header
         theme={theme}
-        onToggleTheme={toggleTheme}
+        onToggleTheme={handleToggleTheme}
         showingFavorites={showingFavorites}
         favoritesCount={favorites.length}
         onToggleFavoritesView={toggleFavoritesView}
@@ -96,7 +112,7 @@ export default function App() {
             pokemons={activeList}
             isFavorite={isFavorite}
             onSelect={openPokemon}
-            onToggleFavorite={toggleFavorite}
+            onToggleFavorite={handleToggleFavorite}
           />
         )}
       </div>
