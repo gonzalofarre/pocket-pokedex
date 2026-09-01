@@ -17,7 +17,11 @@ provided Figma design.
   thing.
 - **lucide-react** for icons
 - **lottie-react** for the Pokéball favorite-toggle animation
-- **Vitest + React Testing Library** for unit tests
+- **Vitest + React Testing Library** for tests — unit tests for pure logic (formatters, type
+  colors, the favorites/theme reducers) plus interaction tests for the components with real
+  user-facing behavior (`PokemonCard`, `TypeFilterBar`, `PokemonModal`): clicking a card opens
+  it, toggling favorite fires with the right id, tab switching, and every way the modal closes
+  (X, backdrop, Escape) — not just that the pure functions underneath are correct
 
 No backend — all data is fetched client-side directly from `pokeapi.co`.
 
