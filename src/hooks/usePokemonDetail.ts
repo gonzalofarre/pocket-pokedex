@@ -33,5 +33,9 @@ export function usePokemonDetail(nameOrId: string | null) {
     evolutionChain: evolutionQuery.data,
     isLoading: detailQuery.isLoading || speciesQuery.isLoading,
     isError: detailQuery.isError || speciesQuery.isError,
+    retry: () => {
+      detailQuery.refetch()
+      speciesQuery.refetch()
+    },
   }
 }

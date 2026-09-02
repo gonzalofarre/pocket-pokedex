@@ -128,7 +128,10 @@ export default function App() {
             No favorites yet — tap the “+” on any card to add one.
           </p>
         ) : galleryList.isError && !showingFavorites ? (
-          <ErrorState message="Couldn't load Pokémon. Check your connection and try again." />
+          <ErrorState
+            message="Couldn't load Pokémon. Check your connection and try again."
+            onRetry={galleryList.retry}
+          />
         ) : galleryList.isLoading && !showingFavorites ? (
           <div className="flex justify-center py-16">
             <Spinner className="h-8 w-8" />

@@ -4,6 +4,7 @@ import { capitalize, formatHeight, formatPokemonId, formatWeight } from '../../u
 import { TypeBadge } from '../ui/TypeBadge'
 import { PokeballPlaceholder } from '../ui/PokeballPlaceholder'
 import { Spinner } from '../ui/Spinner'
+import { ErrorState } from '../ui/ErrorState'
 import { X } from 'lucide-react'
 import { StatsTab } from './tabs/StatsTab'
 import { MovesTab } from './tabs/MovesTab'
@@ -28,7 +29,7 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('stats')
   const [previousPokemonName, setPreviousPokemonName] = useState(pokemonName)
   const [imageFailed, setImageFailed] = useState(false)
-  const { pokemon, species, evolutionChain, isLoading } = usePokemonDetail(pokemonName)
+  const { pokemon, species, evolutionChain, isLoading, isError, retry } = usePokemonDetail(pokemonName)
   const dialogRef = useRef<HTMLDivElement>(null)
   const previouslyFocusedElement = useRef<HTMLElement | null>(null)
 
@@ -116,7 +117,9 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
-          {isLoading || !pokemon ? (
+          {isError ? (
+            <ErrorState message="Couldn't load this Pokémon. Check your connection and try again." onRetry={retry} />
+          ) : isLoading || !pokemon ? (
             <div className="flex justify-center py-16">
               <Spinner className="h-8 w-8" />
             </div>

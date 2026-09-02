@@ -1,4 +1,4 @@
-import { useQueries, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getPokemonByType, getPokemonDetail, getPokemonList, getTypes } from '../api/pokemon'
 import type { NamedAPIResource, Pokemon } from '../api/types'
@@ -45,6 +45,11 @@ export function usePokemonList(selectedType: string | null, initialVisibleCount 
     queryKey: ['pokemon-names', 'default', visibleCount],
     queryFn: () => getPokemonList(visibleCount, 0),
     enabled: !isTypeFiltered,
+    // Growing visibleCount is a brand-new query key, so without this it'd
+    // briefly have no data of its own and "Load More" would blank the
+    // whole grid down to a spinner instead of just growing it. Keeping the
+    // previous page's data around while the bigger page fetches fixes that.
+    placeholderData: keepPreviousData,
   })
 
   const typeQuery = useQuery({
@@ -52,6 +57,7 @@ export function usePokemonList(selectedType: string | null, initialVisibleCount 
     queryFn: () => getPokemonByType(selectedType as string),
     enabled: isTypeFiltered,
     select: (data) => data.pokemon.map((entry) => entry.pokemon),
+    placeholderData: keepPreviousData,
   })
 
   const visibleNames: NamedAPIResource[] = isTypeFiltered
@@ -86,5 +92,6 @@ export function usePokemonList(selectedType: string | null, initialVisibleCount 
     isLoading,
     isError,
     isLoadingMore,
+    retry: () => (isTypeFiltered ? typeQuery.refetch() : defaultQuery.refetch()),
   }
 }
