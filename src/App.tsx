@@ -25,7 +25,9 @@ export default function App() {
   const [selectedType, setSelectedType] = useState<string | null>(initialUrlState.type)
   const [showingFavorites, setShowingFavorites] = useState(initialUrlState.view === 'favorites')
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(initialUrlState.pokemon)
-  const [toast, setToast] = useState<{ id: number; message: string } | null>(null)
+  const [toast, setToast] = useState<{ id: number; message: string; variant: 'added' | 'removed' } | null>(
+    null,
+  )
   const nextToastId = useRef(0)
 
   const galleryList = usePokemonList(selectedType, initialUrlState.count)
@@ -66,6 +68,7 @@ export default function App() {
       setToast({
         id: nextToastId.current,
         message: `${capitalize(name)} ${wasFavorite ? 'removed from' : 'added to'} favorites`,
+        variant: wasFavorite ? 'removed' : 'added',
       })
     },
     [dispatch],
@@ -146,7 +149,9 @@ export default function App() {
 
       <PokemonModal pokemonName={selectedPokemon} onClose={closePokemon} />
 
-      {toast ? <Toast key={toast.id} message={toast.message} onDismiss={dismissToast} /> : null}
+      {toast ? (
+        <Toast key={toast.id} message={toast.message} variant={toast.variant} onDismiss={dismissToast} />
+      ) : null}
     </div>
   )
 }
