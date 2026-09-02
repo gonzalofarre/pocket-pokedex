@@ -19,9 +19,40 @@ interface TypeFilterBarProps {
 // either, which only modeled the 18 classic types.
 const EXCLUDED_TYPES = new Set(['unknown', 'shadow', 'stellar'])
 
+// justify-content applies per flex line, not to the row as a whole, so a
+// short leftover row wraps to and a full row can't both get "spread edge to
+// edge" from one CSS rule — a full single row should stretch to line up
+// with the card grid below it, but doing that to a half-empty wrapped row
+// is what produced the huge, uneven gaps. Measuring whether the chips
+// actually wrapped and toggling the class is the only way to get both.
+function useIsSingleRow(rowKey: unknown) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isSingleRow, setIsSingleRow] = useState(true)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const checkWrap = () => {
+      const children = Array.from(container.children) as HTMLElement[]
+      if (children.length === 0) return
+      const firstTop = children[0].offsetTop
+      setIsSingleRow(children.every((child) => child.offsetTop === firstTop))
+    }
+
+    checkWrap()
+    const observer = new ResizeObserver(checkWrap)
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [rowKey])
+
+  return { containerRef, isSingleRow }
+}
+
 export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps) {
   const { data: types } = useTypesQuery()
   const visibleTypes = (types ?? []).filter((type) => !EXCLUDED_TYPES.has(type.name))
+  const { containerRef, isSingleRow } = useIsSingleRow(visibleTypes.length)
 
   return (
     <>
@@ -35,7 +66,10 @@ export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps
         <TypeDropdown visibleTypes={visibleTypes} selectedType={selectedType} onSelectType={onSelectType} />
       </div>
 
-      <div className="hidden gap-2 sm:flex sm:flex-wrap">
+      <div
+        ref={containerRef}
+        className={`hidden gap-2 sm:flex sm:flex-wrap ${isSingleRow ? 'sm:justify-between' : ''}`}
+      >
         {visibleTypes.map((type) => {
           const isActive = selectedType === type.name
           return (

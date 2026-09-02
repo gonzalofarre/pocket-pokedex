@@ -15,3 +15,14 @@ if (!window.matchMedia) {
       dispatchEvent: () => false,
     }) as MediaQueryList
 }
+
+// jsdom doesn't implement ResizeObserver; TypeFilterBar uses one to detect
+// whether the type chips wrapped onto more than one line. jsdom has no real
+// layout either, so this stub just needs to exist — it never has to fire.
+if (!window.ResizeObserver) {
+  window.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}
