@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Header } from './components/Header/Header'
 import { TypeFilterBar } from './components/TypeFilterBar/TypeFilterBar'
 import { PokemonGrid } from './components/PokemonGrid/PokemonGrid'
@@ -6,11 +6,13 @@ import { LoadMoreButton } from './components/LoadMoreButton/LoadMoreButton'
 import { PokemonModal } from './components/PokemonModal/PokemonModal'
 import { ErrorState } from './components/ui/ErrorState'
 import { Spinner } from './components/ui/Spinner'
+import { Toast } from './components/ui/Toast'
 import { useFavoritePokemons } from './hooks/useFavoritePokemons'
 import { usePokemonList } from './hooks/usePokemonList'
 import { useAppDispatch, useAppSelector } from './store/hooks'
 import { toggleFavorite as toggleFavoriteAction } from './store/favoritesSlice'
 import { toggleTheme as toggleThemeAction } from './store/themeSlice'
+import { capitalize } from './utils/formatters'
 import { readUrlState, updateUrlState } from './utils/urlState'
 
 const initialUrlState = readUrlState()
@@ -23,6 +25,8 @@ export default function App() {
   const [selectedType, setSelectedType] = useState<string | null>(initialUrlState.type)
   const [showingFavorites, setShowingFavorites] = useState(initialUrlState.view === 'favorites')
   const [selectedPokemon, setSelectedPokemon] = useState<string | null>(initialUrlState.pokemon)
+  const [toast, setToast] = useState<{ id: number; message: string } | null>(null)
+  const nextToastId = useRef(0)
 
   const galleryList = usePokemonList(selectedType, initialUrlState.count)
   const favoritePokemons = useFavoritePokemons(favorites)
@@ -44,10 +48,29 @@ export default function App() {
   }, [galleryList.visibleCount, showingFavorites])
 
   const isFavorite = useCallback((id: number) => favorites.includes(id), [favorites])
+
+  // Kept in a ref rather than a `favorites` dependency so this callback's
+  // identity never changes — PokemonCard is memoized specifically so that
+  // favoriting one card doesn't re-render every other card in the grid,
+  // and a new callback reference on every toggle would defeat that.
+  const favoritesRef = useRef(favorites)
+  useEffect(() => {
+    favoritesRef.current = favorites
+  }, [favorites])
+
   const handleToggleFavorite = useCallback(
-    (id: number) => dispatch(toggleFavoriteAction(id)),
+    (id: number, name: string) => {
+      const wasFavorite = favoritesRef.current.includes(id)
+      dispatch(toggleFavoriteAction(id))
+      nextToastId.current += 1
+      setToast({
+        id: nextToastId.current,
+        message: `${capitalize(name)} ${wasFavorite ? 'removed from' : 'added to'} favorites`,
+      })
+    },
     [dispatch],
   )
+  const dismissToast = useCallback(() => setToast(null), [])
   const handleToggleTheme = useCallback(() => dispatch(toggleThemeAction()), [dispatch])
 
   const selectType = useCallback((type: string | null) => {
@@ -122,6 +145,8 @@ export default function App() {
       ) : null}
 
       <PokemonModal pokemonName={selectedPokemon} onClose={closePokemon} />
+
+      {toast ? <Toast key={toast.id} message={toast.message} onDismiss={dismissToast} /> : null}
     </div>
   )
 }

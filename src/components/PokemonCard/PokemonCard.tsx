@@ -12,7 +12,7 @@ interface PokemonCardProps {
   isLoading: boolean
   isFavorite: boolean
   onSelect: (name: string) => void
-  onToggleFavorite: (id: number) => void
+  onToggleFavorite: (id: number, name: string) => void
 }
 
 // Memoized because the grid can hold hundreds of these (Load More, or the
@@ -49,7 +49,7 @@ export const PokemonCard = memo(function PokemonCard({
 
   const handleToggleFavorite = () => {
     if (!isFavorite) setShowBurst(true)
-    onToggleFavorite(pokemon.id)
+    onToggleFavorite(pokemon.id, pokemon.name)
   }
 
   return (

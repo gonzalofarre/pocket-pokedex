@@ -5,7 +5,7 @@ interface PokemonGridProps {
   pokemons: PokemonListItem[]
   isFavorite: (id: number) => boolean
   onSelect: (name: string) => void
-  onToggleFavorite: (id: number) => void
+  onToggleFavorite: (id: number, name: string) => void
 }
 
 export function PokemonGrid({ pokemons, isFavorite, onSelect, onToggleFavorite }: PokemonGridProps) {

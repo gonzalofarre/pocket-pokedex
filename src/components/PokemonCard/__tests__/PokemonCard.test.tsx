@@ -68,7 +68,7 @@ describe('PokemonCard', () => {
     expect(onSelect).toHaveBeenCalledWith('bulbasaur')
   })
 
-  it('calls onToggleFavorite with the pokémon id when the favorite button is clicked', async () => {
+  it('calls onToggleFavorite with the pokémon id and name when the favorite button is clicked', async () => {
     const onToggleFavorite = vi.fn()
     render(
       <PokemonCard
@@ -80,7 +80,7 @@ describe('PokemonCard', () => {
       />,
     )
     await userEvent.click(screen.getByRole('button', { name: /remove bulbasaur from favorites/i }))
-    expect(onToggleFavorite).toHaveBeenCalledWith(1)
+    expect(onToggleFavorite).toHaveBeenCalledWith(1, 'bulbasaur')
   })
 
   it('reflects favorite state via the button label and pressed state', () => {
