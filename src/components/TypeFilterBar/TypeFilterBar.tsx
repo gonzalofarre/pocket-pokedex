@@ -128,19 +128,19 @@ function TypeDropdown({ visibleTypes, selectedType, onSelectType }: TypeDropdown
               role="option"
               aria-selected={selectedType === null}
               onClick={() => selectOption(null)}
-              className="w-full cursor-pointer rounded-xl px-3 py-2 text-left text-sm font-semibold text-text transition hover:bg-surface-muted"
+              className="w-full cursor-pointer rounded-xl px-3 py-1.5 text-left text-sm font-semibold text-text transition hover:bg-surface-muted"
             >
               All Types
             </button>
           </li>
           {visibleTypes.map((type) => (
-            <li key={type.name} className="mt-1">
+            <li key={type.name} className="mt-0.5">
               <button
                 type="button"
                 role="option"
                 aria-selected={selectedType === type.name}
                 onClick={() => selectOption(type.name)}
-                className="w-full cursor-pointer rounded-xl px-3 py-2 text-left transition hover:bg-surface-muted"
+                className="w-full cursor-pointer rounded-xl px-3 py-1 text-left transition hover:bg-surface-muted"
               >
                 <TypeBadge type={type.name} />
               </button>
