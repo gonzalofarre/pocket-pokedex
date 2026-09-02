@@ -4,6 +4,7 @@ import { useTypesQuery } from '../../hooks/usePokemonList'
 import { getTypeColor } from '../../utils/typeColors'
 import { capitalize } from '../../utils/formatters'
 import type { NamedAPIResource } from '../../api/types'
+import { TypeBadge } from '../ui/TypeBadge'
 
 interface TypeFilterBarProps {
   selectedType: string | null
@@ -139,10 +140,9 @@ function TypeDropdown({ visibleTypes, selectedType, onSelectType }: TypeDropdown
                 role="option"
                 aria-selected={selectedType === type.name}
                 onClick={() => selectOption(type.name)}
-                className="w-full cursor-pointer rounded-xl px-3 py-2 text-left text-sm font-semibold text-white transition"
-                style={{ backgroundColor: getTypeColor(type.name) }}
+                className="w-full cursor-pointer rounded-xl px-3 py-2 text-left transition hover:bg-surface-muted"
               >
-                {capitalize(type.name)}
+                <TypeBadge type={type.name} />
               </button>
             </li>
           ))}
