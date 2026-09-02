@@ -58,3 +58,43 @@ body.modal-open {
 .pokeball-jump {
   animation: pokeball-jump 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
+
+/*
+ * Two different entrances for the same dialog panel: a bottom-sheet slide-up
+ * on phones (matches its rounded-t-2xl bottom-sheet shape there) and a
+ * subtler rise+scale on tablet/desktop (matches its centered-card shape at
+ * the sm breakpoint). Same trick as .type-chip — swap via media query
+ * rather than duplicating markup.
+ */
+@keyframes modal-enter-mobile {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes modal-enter-desktop {
+  from {
+    transform: translateY(8px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-panel {
+  animation: modal-enter-mobile 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (min-width: 640px) {
+  .modal-panel {
+    animation-name: modal-enter-desktop;
+    animation-duration: 0.2s;
+  }
+}

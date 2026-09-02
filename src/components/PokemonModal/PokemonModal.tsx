@@ -101,7 +101,7 @@ export function PokemonModal({ pokemonName, onClose }: PokemonModalProps) {
         tabIndex={-1}
         aria-label={pokemon ? `${capitalize(pokemon.name)} details` : 'Pokémon details'}
         onClick={(event) => event.stopPropagation()}
-        className="flex h-full w-full flex-col overflow-hidden rounded-t-2xl bg-surface shadow-2xl outline-none sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:rounded-2xl"
+        className="modal-panel flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl bg-surface shadow-2xl outline-none sm:max-h-[90vh] sm:max-w-lg sm:rounded-2xl"
       >
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <h2 className="text-lg font-bold text-text">Pokémon Details</h2>
