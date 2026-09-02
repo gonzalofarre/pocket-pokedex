@@ -19,10 +19,11 @@
   /*
    * Extra breakpoint between the default 0 and Tailwind's `sm` (640px):
    * splits "very small" phones (iPhone 5/SE-classic, 320px — one column
-   * stays readable) from "moderate" modern phones (iPhone 12/13/14, ~390px
-   * — two columns already fit comfortably).
+   * stays readable) from everything else in common circulation — Galaxy S8
+   * (360px), the current iPhone SE (375px), iPhone 12/13/14 (~390px — two
+   * columns already fit comfortably in all three).
    */
-  --breakpoint-xs: 23.75rem; /* 380px */
+  --breakpoint-xs: 22.5rem; /* 360px */
 
   /* Neutrals — light mode defaults */
   --color-surface: #ffffff;
