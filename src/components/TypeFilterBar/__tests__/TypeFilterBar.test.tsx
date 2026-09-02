@@ -16,8 +16,10 @@ vi.mock('../../../api/pokemon', () => ({
 
 // Both the phone dropdown and the tablet/desktop chip row render at once —
 // CSS (`sm:hidden` / `hidden sm:flex`) picks one visually, but jsdom has no
-// real layout, so both exist in the DOM for every test. Role-based queries
-// (combobox vs. button) disambiguate instead of relying on which is "shown".
+// real layout, so both exist in the DOM for every test. The dropdown's
+// trigger always has an accessible name of "Filter by type" (its aria-label
+// wins over its visible text, which changes to the selected type), so it
+// never collides with a same-named chip button.
 
 describe('TypeFilterBar — desktop/tablet chips', () => {
   it('renders a chip per fetched type, excluding non-filterable ones like "unknown"', async () => {
@@ -45,40 +47,68 @@ describe('TypeFilterBar — desktop/tablet chips', () => {
 })
 
 describe('TypeFilterBar — phone dropdown', () => {
-  it('lists "All Types" plus every fetched type, excluding non-filterable ones', async () => {
+  it('shows "All Types" on the trigger and keeps the menu closed by default', () => {
     renderWithQueryClient(<TypeFilterBar selectedType={null} onSelectType={vi.fn()} />)
-    const select = screen.getByRole('combobox', { name: /filter by type/i })
-    // The <select> itself is there immediately; its options only populate
-    // once the types query resolves, so wait for one before asserting.
-    await within(select).findByRole('option', { name: 'Water' })
-    const options = within(select)
+    const trigger = screen.getByRole('button', { name: /filter by type/i })
+    expect(trigger).toHaveTextContent('All Types')
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+  })
+
+  it('shows the selected type on the trigger', () => {
+    renderWithQueryClient(<TypeFilterBar selectedType="water" onSelectType={vi.fn()} />)
+    expect(screen.getByRole('button', { name: /filter by type/i })).toHaveTextContent('Water')
+  })
+
+  it('opens on click and lists "All Types" plus every fetched type, excluding "unknown"', async () => {
+    renderWithQueryClient(<TypeFilterBar selectedType={null} onSelectType={vi.fn()} />)
+    await userEvent.click(screen.getByRole('button', { name: /filter by type/i }))
+    const listbox = await screen.findByRole('listbox')
+    const options = within(listbox)
       .getAllByRole('option')
       .map((option) => option.textContent)
     expect(options).toEqual(['All Types', 'Fire', 'Water'])
   })
 
-  it('reflects the selected type as the dropdown value', async () => {
-    renderWithQueryClient(<TypeFilterBar selectedType="water" onSelectType={vi.fn()} />)
-    const select = screen.getByRole('combobox', { name: /filter by type/i })
-    await within(select).findByRole('option', { name: 'Water' })
-    expect(select).toHaveValue('water')
-  })
-
-  it('calls onSelectType with the chosen type when changed', async () => {
+  it('calls onSelectType and closes the menu when an option is chosen', async () => {
     const onSelectType = vi.fn()
     renderWithQueryClient(<TypeFilterBar selectedType={null} onSelectType={onSelectType} />)
-    const select = screen.getByRole('combobox', { name: /filter by type/i })
-    await within(select).findByRole('option', { name: 'Fire' })
-    await userEvent.selectOptions(select, 'fire')
+    await userEvent.click(screen.getByRole('button', { name: /filter by type/i }))
+    const listbox = await screen.findByRole('listbox')
+    await userEvent.click(within(listbox).getByRole('option', { name: 'Fire' }))
     expect(onSelectType).toHaveBeenCalledWith('fire')
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 
   it('calls onSelectType with null when "All Types" is chosen', async () => {
     const onSelectType = vi.fn()
     renderWithQueryClient(<TypeFilterBar selectedType="fire" onSelectType={onSelectType} />)
-    const select = screen.getByRole('combobox', { name: /filter by type/i })
-    await within(select).findByRole('option', { name: 'Fire' })
-    await userEvent.selectOptions(select, 'All Types')
+    await userEvent.click(screen.getByRole('button', { name: /filter by type/i }))
+    const listbox = await screen.findByRole('listbox')
+    await userEvent.click(within(listbox).getByRole('option', { name: 'All Types' }))
     expect(onSelectType).toHaveBeenCalledWith(null)
+  })
+
+  it('closes on Escape without changing the selection', async () => {
+    const onSelectType = vi.fn()
+    renderWithQueryClient(<TypeFilterBar selectedType={null} onSelectType={onSelectType} />)
+    await userEvent.click(screen.getByRole('button', { name: /filter by type/i }))
+    await screen.findByRole('listbox')
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(onSelectType).not.toHaveBeenCalled()
+  })
+
+  it('closes when clicking outside', async () => {
+    renderWithQueryClient(
+      <div>
+        <TypeFilterBar selectedType={null} onSelectType={vi.fn()} />
+        <button type="button">outside</button>
+      </div>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: /filter by type/i }))
+    await screen.findByRole('listbox')
+    await userEvent.click(screen.getByRole('button', { name: 'outside' }))
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 })
