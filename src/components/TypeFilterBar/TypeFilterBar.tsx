@@ -41,7 +41,11 @@ export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps
         >
           <option value="">All Types</option>
           {visibleTypes.map((type) => (
-            <option key={type.name} value={type.name} style={{ color: getTypeColor(type.name) }}>
+            <option
+              key={type.name}
+              value={type.name}
+              style={{ backgroundColor: getTypeColor(type.name), color: '#fff' }}
+            >
               {capitalize(type.name)}
             </option>
           ))}
