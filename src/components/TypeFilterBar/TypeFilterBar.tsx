@@ -35,7 +35,7 @@ export function TypeFilterBar({ selectedType, onSelectType }: TypeFilterBarProps
         <TypeDropdown visibleTypes={visibleTypes} selectedType={selectedType} onSelectType={onSelectType} />
       </div>
 
-      <div className="hidden gap-2 sm:flex sm:flex-wrap sm:justify-between">
+      <div className="hidden gap-2 sm:flex sm:flex-wrap">
         {visibleTypes.map((type) => {
           const isActive = selectedType === type.name
           return (
